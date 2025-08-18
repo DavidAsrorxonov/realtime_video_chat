@@ -119,6 +119,52 @@ export const logout = (req, res) => {
   res.status(200).json({ message: "User logged out successfully" });
 };
 
-export const onboarding = (req, res) => {
-  res.send("onboarding route");
+export const onboarding = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const { fullName, bio, nativeLanguage, learningLanguage, location } =
+      req.body;
+
+    if (
+      !fullName ||
+      !bio ||
+      !nativeLanguage ||
+      !learningLanguage ||
+      !location
+    ) {
+      return res.status(400).json({
+        message: "All fields are required",
+        missingFields: [
+          !fullName && "fullName",
+          !bio && "bio",
+          !nativeLanguage && "nativeLanguage",
+          !learningLanguage && "learningLanguage",
+          !location && "location",
+        ].filter(Boolean),
+      });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        ...req.body,
+        isOnboarded: true,
+      },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      user: updatedUser,
+      message: "User updated successfully",
+    });
+  } catch (error) {
+    console.log("Error in onboarding controller", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
