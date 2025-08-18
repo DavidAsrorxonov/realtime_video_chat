@@ -31,6 +31,10 @@ const OnboardingPage = () => {
       toast.success("Profile onboarded successfully");
       queryClient.invalidateQueries({ queryKey: ["authUser"] });
     },
+
+    onError: (error) => {
+      toast.error(error.response.data.message);
+    },
   });
 
   const handleOnboarding = (e) => {
@@ -38,7 +42,12 @@ const OnboardingPage = () => {
     mutate(formState);
   };
 
-  const handleRandomAvatar = () => {};
+  const handleRandomAvatar = () => {
+    const idx = Math.floor(Math.random() * 100) + 1;
+    const randomAvatar = `https://avatar.iran.liara.run/public/${idx}.png`;
+    setFormState({ ...formState, profilePic: randomAvatar });
+    toast.success("Random profile picture generated");
+  };
 
   return (
     <div className="min-h-screen bg-base-100 flex items-center justify-center p-4">
