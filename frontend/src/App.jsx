@@ -9,6 +9,7 @@ import {
   ChatPage,
   NotificationsPage,
 } from "./pages";
+import { Toaster } from "react-hot-toast";
 
 const App = () => {
   return (
@@ -22,6 +23,8 @@ const App = () => {
         <Route path="/chat" element={<ChatPage />} />
         <Route path="/notifications" element={<NotificationsPage />} />
       </Routes>
+
+      <Toaster />
     </div>
   );
 };
