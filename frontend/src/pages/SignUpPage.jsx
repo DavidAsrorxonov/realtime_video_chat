@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { ShipWheelIcon } from "lucide-react";
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { axiosInstance } from "../lib/axios";
+import { signup } from "../lib/api";
 
 const SignUpPage = () => {
   const [signUpData, setSignUpData] = useState({
@@ -10,16 +10,11 @@ const SignUpPage = () => {
     email: "",
     password: "",
   });
-  const navigate = useNavigate();
 
   const queryClient = useQueryClient();
 
   const { mutate, isPending, error } = useMutation({
-    mutationFn: async () => {
-      const res = await axiosInstance.post("/auth/signup", signUpData);
-
-      return res.data;
-    },
+    mutationFn: signup,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["authUser"] });
     },
@@ -27,7 +22,7 @@ const SignUpPage = () => {
 
   const handleSignup = (e) => {
     e.preventDefault();
-    mutate();
+    mutate(signUpData);
   };
 
   return (
@@ -44,6 +39,12 @@ const SignUpPage = () => {
               Nexu
             </span>
           </div>
+
+          {error && (
+            <div className="alert alert-error mb-4">
+              <span>{error.response.data.message}</span>
+            </div>
+          )}
 
           <div className="w-full">
             <form onSubmit={handleSignup}>
@@ -139,7 +140,14 @@ const SignUpPage = () => {
                 </div>
 
                 <button className="btn btn-primary w-full" type="submit">
-                  {isPending ? "Signing up..." : "Create an account"}
+                  {isPending ? (
+                    <>
+                      <span className="loading loading-spinner loading-xs"></span>
+                      Creating account...
+                    </>
+                  ) : (
+                    "Create account"
+                  )}
                 </button>
 
                 <div className="text-center mt-4">
