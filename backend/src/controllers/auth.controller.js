@@ -1,8 +1,8 @@
-export const signup = (req, res) => {
+export const signup = async (req, res) => {
   res.send("signup");
 };
 
-export const login = (req, res) => {
+export const login = async (req, res) => {
   res.send("login");
 };
 
