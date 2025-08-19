@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import useAuthUser from "../hooks/useAuthUser";
 import { useQuery } from "@tanstack/react-query";
@@ -13,6 +13,10 @@ import {
   Thread,
   Window,
 } from "stream-chat-react";
+import { StreamChat } from "stream-chat";
+import toast from "react-hot-toast";
+
+const STREAM_API_KEY = import.meta.env.VITE_STREAM_API_KEY;
 
 const ChatPage = () => {
   const { id: targetUserId } = useParams();
@@ -23,11 +27,49 @@ const ChatPage = () => {
 
   const { authUser } = useAuthUser();
 
-  const { data } = useQuery({
+  const { data: tokenData } = useQuery({
     queryKey: ["streamToken"],
     queryFn: getStreamToken,
     enabled: !!authUser,
   });
+
+  useEffect(() => {
+    const initChat = async () => {
+      if (!tokenData?.token || !authUser) return;
+
+      try {
+        console.log("Initializing chat");
+        const client = StreamChat.getInstance(STREAM_API_KEY);
+
+        await client.connectUser(
+          {
+            id: authUser._id,
+            name: authUser.fullName,
+            image: authUser.profilePic,
+          },
+          tokenData.token
+        );
+
+        const channelId = [authUser._id, targetUserId].sort().join("-");
+
+        const currentChannel = client.channel("messaging", channelId, {
+          members: [authUser._id, targetUserId],
+        });
+
+        await currentChannel.watch();
+
+        setChatClient(client);
+        setChannel(currentChannel);
+      } catch (error) {
+        console.log("Error in initializing chat", error);
+        toast.error("Could not connect to the chat. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initChat();
+  }, []);
 
   return <div>Chat with {targetUserId}</div>;
 };
