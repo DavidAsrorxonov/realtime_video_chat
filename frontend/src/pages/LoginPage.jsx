@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { ShipWheelIcon } from "lucide-react";
 import { Link } from "react-router";
-import useLogin from "../hooks/useLogin";
+import useAuth from "../hooks/useAuth";
 
 const LoginPage = () => {
   const [loginData, setLoginData] = useState({
@@ -9,7 +9,7 @@ const LoginPage = () => {
     password: "",
   });
 
-  const { error, mutate, isPending } = useLogin();
+  const { mutate, error, isPending } = useAuth("login");
 
   const handleLogin = (e) => {
     e.preventDefault();
