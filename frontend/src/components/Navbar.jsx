@@ -4,6 +4,7 @@ import { Link, useLocation } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import useAuth from "../hooks/useAuth";
 import { BellIcon, LogOutIcon, ShipWheelIcon } from "lucide-react";
+import ThemeSelector from "../themes/ThemeSelector";
 
 const Navbar = () => {
   const { authUser } = useAuthUser();
@@ -34,6 +35,8 @@ const Navbar = () => {
               </button>
             </Link>
           </div>
+
+          <ThemeSelector />
 
           <div className="avatar">
             <div className="w-9 rounded-full">
