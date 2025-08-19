@@ -7,6 +7,7 @@ import {
   MessageSquareIcon,
   UserCheckIcon,
 } from "lucide-react";
+import NoNotificationsFound from "../components/NoNotificationFound";
 
 const NotificationsPage = () => {
   const queryClient = useQueryClient();
@@ -139,6 +140,10 @@ const NotificationsPage = () => {
                   ))}
                 </div>
               </section>
+            )}
+
+            {incomingRequests.length === 0 && acceptedRequests.length === 0 && (
+              <NoNotificationsFound />
             )}
           </>
         )}
