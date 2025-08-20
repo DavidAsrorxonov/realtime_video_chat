@@ -12,9 +12,12 @@ import {
   MessageList,
   Thread,
   Window,
+  useCreateChatClient,
 } from "stream-chat-react";
 import { StreamChat } from "stream-chat";
 import toast from "react-hot-toast";
+import ChatLoader from "../components/ChatLoader";
+import CallButton from "../components/CallButton";
 
 const STREAM_API_KEY = import.meta.env.VITE_STREAM_API_KEY;
 
@@ -39,21 +42,22 @@ const ChatPage = () => {
 
       try {
         console.log("Initializing chat");
+        console.log("User ID", typeof authUser._id.toString());
         const client = StreamChat.getInstance(STREAM_API_KEY);
 
         await client.connectUser(
           {
-            id: authUser._id,
+            id: authUser._id.toString(),
             name: authUser.fullName,
             image: authUser.profilePic,
           },
-          tokenData.token
+          tokenData.token.toString()
         );
 
         const channelId = [authUser._id, targetUserId].sort().join("-");
 
         const currentChannel = client.channel("messaging", channelId, {
-          members: [authUser._id, targetUserId],
+          members: [authUser._id.toString(), targetUserId.toString()],
         });
 
         await currentChannel.watch();
@@ -69,9 +73,27 @@ const ChatPage = () => {
     };
 
     initChat();
-  }, []);
+  }, [tokenData, authUser, targetUserId]);
 
-  return <div>Chat with {targetUserId}</div>;
+  if (loading || !chatClient || !channel) return <ChatLoader />;
+
+  return (
+    <div className="h-[93vh]">
+      <Chat client={chatClient}>
+        <Channel channel={channel}>
+          <div className="w-full relative">
+            <CallButton />
+            <Window>
+              <ChannelHeader />
+              <MessageList />
+              <MessageInput focus />
+            </Window>
+          </div>
+          <Thread />
+        </Channel>
+      </Chat>
+    </div>
+  );
 };
 
 export default ChatPage;
